@@ -38,18 +38,31 @@ def main(in_path, out_path):
 
   import glob
   import os
+  import time
   print "Checking input path for files: {0}".format(in_path)
   list_of_files = glob.glob("{0}*.pdf".format(in_path))
   print "Total number of PDFs: {0}".format(len(list_of_files))
 
-  for in_file in list_of_files:
+  times = []
+  with open('extract.log', 'w') as log:
 
-    TXT = os.path.basename(in_file).replace('.pdf', '.txt')
-    out_file = os.path.join(out_path, TXT)
-    print "Extracting the following PDF: {0}".format(in_file)
-    print "Writing to TXT file: {0}".format(out_file)
-    extract_pdf(in_file, out_file)
-    print ""
+    for in_file in list_of_files:
+
+      in_file_raw = os.path.basename(in_file)
+      TXT = in_file_raw.replace('.pdf', '.txt')
+      out_file = os.path.join(out_path, TXT)
+      print "Extracting the following PDF: {0}".format(in_file)
+      print "Writing to TXT file: {0}".format(out_file)
+      time_start = time.time()
+      extract_pdf(in_file, out_file)
+      time_stop = time.time()
+      time_taken = time_stop - time_start
+      times.append(time_taken)
+      print "Time taken: {0} sec".format(time_taken)
+      print ""
+      log.write("{0} {1}\n".format(in_file_raw, time_taken))
+
+    log.write("# Average time taken: {0} sec".format(sum(times)/(1.0*len(times))))
 
 if __name__ == "__main__":
 
